@@ -1,6 +1,10 @@
 import { getAlchemy } from "@/lib/clients";
 import useSWR from "swr";
-import { getAlchemyImageSrc, getNftAsset } from "@/lib/utils";
+import { getAlchemyImageSrc } from "@/lib/utils";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import getMetadata from "../getMetadata";
+import getIpfsLink from "../getIpfsLink";
 
 function formatImageReturn(imageData?: string | string[]): string[] {
   if (!imageData) {
@@ -31,20 +35,18 @@ export const useNft = ({
   hasCustomImplementation: boolean;
   chainId: number
 }) => {
+  const [image, setImage] = useState("")
   let key = null;
   if (hasCustomImplementation) key = cacheKey ?? `getNftAsset-${tokenId}`;
 
-  const {
-    data: customNftData,
-    isLoading: customNftLoading,
-    error: customNftError,
-  } = useSWR(key, () => getNftAsset(tokenId, apiEndpoint), {
-    refreshInterval: refreshInterval,
-    shouldRetryOnError: false,
-    retry: 0,
-  });
-
-  if (customNftError) console.log("CUSTOM NFT DATA FETCH ERROR: ", customNftError);
+  useEffect(() => {
+    const init = async () => {
+      const metadata = getMetadata(tokenId)
+      const photo = getIpfsLink(metadata.image)
+      setImage(photo)
+    }
+    init()
+  },[tokenId])
 
   const { data: nftMetadata, isLoading: nftMetadataLoading } = useSWR(
     `nftMetadata/${contractAddress}/${tokenId}`,
@@ -55,12 +57,11 @@ export const useNft = ({
     }
   );
 
+  console.log("SWEETS nftMetadata", nftMetadata)
+
   return {
-    data:
-      hasCustomImplementation && !customNftError
-        ? formatImageReturn(customNftData)
-        : formatImageReturn(getAlchemyImageSrc(nftMetadata?.[0])),
+    data: [image],
     nftMetadata: nftMetadata?.[0],
-    loading: hasCustomImplementation ? customNftLoading : nftMetadataLoading,
+    loading: nftMetadataLoading,
   };
 };
