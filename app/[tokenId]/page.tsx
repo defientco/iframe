@@ -66,7 +66,6 @@ export default function Token({ params, searchParams }: TokenParams) {
     const result = await getAccount(Number(tokenId), contractAddress, chainId);
     return result.data;
   });
-  console.log("SWEETS account", account);
 
   // Get nft's TBA account bytecode to check if account is deployed or not
   const { data: accountBytecode } = useSWR(
