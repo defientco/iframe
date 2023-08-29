@@ -28,13 +28,10 @@ export default function Token({ params, searchParams }: TokenParams) {
   const chainId = process.env.NEXT_PUBLIC_TESTNET ? 5 : 1;
   const { tokenId } = params;
   const [showTokenDetail, setShowTokenDetail] = useState(false);
-  console.log("SWEETS contractAddress", contractAddress);
-  console.log("SWEETS chainId", chainId);
-  console.log("SWEETS tokenId", tokenId);
 
   const {
     data: nftImages,
-    nftMetadata,
+    nftTitle,
     loading: nftMetadataLoading,
   } = useNft({
     tokenId: parseInt(tokenId as string),
@@ -69,6 +66,7 @@ export default function Token({ params, searchParams }: TokenParams) {
     const result = await getAccount(Number(tokenId), contractAddress, chainId);
     return result.data;
   });
+  console.log("SWEETS account", account);
 
   // Get nft's TBA account bytecode to check if account is deployed or not
   const { data: accountBytecode } = useSWR(
@@ -116,20 +114,18 @@ export default function Token({ params, searchParams }: TokenParams) {
     }
   }, [nfts, lensNfts]);
 
-  console.log("SWEETS nftImages", nftImages);
-
   return (
     <div className="h-screen w-screen bg-slate-100">
       <div className="max-w-screen relative mx-auto aspect-square max-h-screen overflow-hidden bg-white">
         <div className="relative h-full w-full">
-          {account && nftImages && nftMetadata && (
+          {account && nftImages && nftTitle && (
             <TokenDetail
               isOpen={showTokenDetail}
               handleOpenClose={setShowTokenDetail}
               approvalTokensCount={0}
               account={account}
               tokens={tokens}
-              title={nftMetadata.title}
+              title={nftTitle}
               chainId={chainId}
             />
           )}

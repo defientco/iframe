@@ -50,6 +50,10 @@ export async function getAccount(
   chainId: number
 ): Promise<GetAccount> {
   try {
+  console.log("SWEETS tokenId", tokenId);
+  console.log("SWEETS contractAddress", contractAddress);
+  console.log("SWEETS chainId", chainId);
+
     const publicClient = getPublicClient(chainId);
     const response = (await publicClient.readContract({
       address: tokenboundAddress as `0x${string}`,
@@ -57,6 +61,8 @@ export async function getAccount(
       functionName: "account",
       args: [implementationAddress, String(chainId), contractAddress, tokenId, salt],
     })) as string;
+  console.log("SWEETS response", response);
+
     return { data: response };
   } catch (err) {
     console.error(err);
