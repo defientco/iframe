@@ -10,6 +10,8 @@ import { useNft } from "@/lib/hooks";
 import { TbaOwnedNft } from "@/lib/types";
 import { TokenDetail } from "./TokenDetail";
 import { HAS_CUSTOM_IMPLEMENTATION } from "@/lib/constants";
+import { getTotalSupply } from "@/lib/utils/getTotalSupply";
+import { parse } from "path";
 
 interface TokenParams {
   params: {
@@ -22,6 +24,7 @@ interface TokenParams {
 
 export default function Token({ params, searchParams }: TokenParams) {
   const [imagesLoaded, setImagesLoaded] = useState(false);
+  const [totalSupply, setTotalSupply] = useState<string | undefined>("8888");
   const [nfts, setNfts] = useState<TbaOwnedNft[]>([]);
   const [lensNfts, setLensNfts] = useState<TbaOwnedNft[]>([]);
   const contractAddress = process.env.NEXT_PUBLIC_CRE8ORS_ADDRESS as string;
@@ -39,6 +42,13 @@ export default function Token({ params, searchParams }: TokenParams) {
     hasCustomImplementation: HAS_CUSTOM_IMPLEMENTATION,
     chainId,
   });
+  const establishTotalSupply = async () => {
+    const { supply } = await getTotalSupply(1);
+    setTotalSupply(supply);
+  };
+  useEffect(() => {
+    establishTotalSupply();
+  }, []);
 
   useEffect(() => {
     if (!isNil(nftImages) && nftImages.length) {
@@ -113,6 +123,7 @@ export default function Token({ params, searchParams }: TokenParams) {
     }
   }, [nfts, lensNfts]);
 
+  if (totalSupply && parseInt(tokenId, 10) > parseInt(totalSupply, 10)) return null;
   return (
     <div className="h-screen w-screen bg-slate-100">
       <div className="max-w-screen relative mx-auto aspect-square max-h-screen overflow-hidden bg-white">
