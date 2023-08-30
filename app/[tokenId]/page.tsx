@@ -1,6 +1,6 @@
 "use client";
 /* eslint-disable @next/next/no-img-element */
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import useSWR from "swr";
 import { isNil } from "lodash";
 import { getAccount, getAccountStatus, getLensNfts, getNfts } from "@/lib/utils";
@@ -42,13 +42,13 @@ export default function Token({ params, searchParams }: TokenParams) {
     hasCustomImplementation: HAS_CUSTOM_IMPLEMENTATION,
     chainId,
   });
-  const establishTotalSupply = async () => {
-    const { supply } = await getTotalSupply(1);
+  const establishTotalSupply = useCallback(async () => {
+    const { supply } = await getTotalSupply(chainId);
     setTotalSupply(supply);
-  };
+  }, [chainId]);
   useEffect(() => {
     establishTotalSupply();
-  }, []);
+  }, [establishTotalSupply]);
 
   useEffect(() => {
     if (!isNil(nftImages) && nftImages.length) {
