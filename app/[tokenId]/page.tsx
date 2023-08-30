@@ -24,7 +24,7 @@ interface TokenParams {
 
 export default function Token({ params, searchParams }: TokenParams) {
   const [imagesLoaded, setImagesLoaded] = useState(false);
-  const [totalSupply, setTotalSupply] = useState<string | undefined>("8888");
+  const [totalSupply, setTotalSupply] = useState<string | undefined | null>(null);
   const [nfts, setNfts] = useState<TbaOwnedNft[]>([]);
   const [lensNfts, setLensNfts] = useState<TbaOwnedNft[]>([]);
   const contractAddress = process.env.NEXT_PUBLIC_CRE8ORS_ADDRESS as string;
@@ -123,6 +123,7 @@ export default function Token({ params, searchParams }: TokenParams) {
     }
   }, [nfts, lensNfts]);
 
+  if (!totalSupply) return null;
   if (totalSupply && parseInt(tokenId, 10) > parseInt(totalSupply, 10)) return null;
   return (
     <div className="h-screen w-screen bg-slate-100">
